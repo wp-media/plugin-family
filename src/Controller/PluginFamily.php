@@ -24,6 +24,7 @@ class PluginFamily implements PluginFamilyInterface {
 		$events['admin_notices'] = 'display_error_notice';
 		$events['enqueue_block_editor_assets'] = 'enqueue_assets';
 
+
 		return $events;
 	}
 
@@ -253,8 +254,12 @@ class PluginFamily implements PluginFamilyInterface {
 		exit;
 	}
 
+	private function is_imagify_activated(): bool {
+		return defined( 'IMAGIFY_VERSION' );
+	}
+
 	public function enqueue_assets() {
-		if ( wp_script_is( 'plugin-family-script' ) ) {
+		if ( $this->is_imagify_activated() || wp_script_is( 'plugin-family-script' ) ) {
 			return;
 		}
 
@@ -263,7 +268,11 @@ class PluginFamily implements PluginFamilyInterface {
 		wp_enqueue_script(
 			'plugin-family-script',
 			$script_url,
-			array( 'wp-plugins', 'wp-edit-post', 'wp-i18n', 'wp-element' )
+			array( 'react-jsx-runtime', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-primitives' ),
+			'1.0.5',
+			[
+				'in_footer' => true,
+			]
 		);
 	}
 }
