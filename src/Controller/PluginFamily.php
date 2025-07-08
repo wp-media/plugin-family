@@ -258,7 +258,7 @@ class PluginFamily implements PluginFamilyInterface {
 			return;
 		}
 
-		$script_url = plugin_dir_url( dirname( __FILE__ ) ) . 'assets/js/index.js';
+		$script_url = plugin_dir_url( dirname( __FILE__ ) ) . 'assets/build/index.js';
 
 		wp_enqueue_script(
 			'plugin-family-script',
