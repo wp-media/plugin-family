@@ -4,6 +4,6 @@ module.exports = {
 	...defaultConfig,
 	output: {
 		...defaultConfig.output,
-		path: __dirname + '/assets/build',
+		path: __dirname + '/src/assets/js',
 	},
 };
