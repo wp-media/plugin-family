@@ -86,3 +86,29 @@ addFilter(
 	'wpmedia-plugin-family/promote-imagify',
 	promoteImagifyButton
 );
+
+const promoteImagifyUploaderMessage = createHigherOrderComponent((BlockEdit) => {
+	return (props) => {
+		if (props.name !== 'core/image') {
+			return <BlockEdit {...props} />;
+		}
+		return (
+			<Fragment>
+				<BlockEdit {...props} />
+				<InspectorControls>
+					<PanelBody title="">
+						<div style={{padding: '8px 0', color: '#2271b1', fontWeight: 'bold'}}>
+							📢 {__('Optimize this image for web performance!')}
+						</div>
+					</PanelBody>
+				</InspectorControls>
+			</Fragment>
+		);
+	};
+}, 'promoteImagifyUploaderMessage');
+
+addFilter(
+	'editor.BlockEdit',
+	'wpmedia-plugin-family/promote-imagify',
+	promoteImagifyUploaderMessage
+);
