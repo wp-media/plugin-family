@@ -22,6 +22,7 @@ class PluginFamily implements PluginFamilyInterface {
 	public static function get_subscribed_events(): array {
 		$events                  = self::get_post_install_event();
 		$events['admin_notices'] = 'display_error_notice';
+		$events['enqueue_block_editor_assets'] = 'enqueue_assets';
 
 		return $events;
 	}
@@ -250,5 +251,19 @@ class PluginFamily implements PluginFamilyInterface {
 
 		wp_safe_redirect( wp_get_referer() );
 		exit;
+	}
+
+	public function enqueue_assets() {
+		if ( wp_script_is( 'plugin-family-script' ) ) {
+			return;
+		}
+
+		$script_url = plugin_dir_url( dirname( __FILE__ ) ) . 'assets/js/index.js';
+
+		wp_enqueue_script(
+			'plugin-family-script',
+			$script_url,
+			array( 'wp-plugins', 'wp-edit-post', 'wp-i18n', 'wp-element' )
+		);
 	}
 }

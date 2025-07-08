@@ -1,3 +1,5 @@
 /vendor
 /composer.lock
 tests/Unit/.phpunit.result.cache
+node_modules
+.idea

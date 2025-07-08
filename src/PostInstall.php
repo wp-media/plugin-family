@@ -12,8 +12,8 @@ class PostInstall {
      * @var array
      */
     private static $files = [
-        'PluginFamily',
-        'wp_media_plugins',
+        'PluginFamily.php',
+        'wp_media_plugins.php',
     ];
 
     /**
