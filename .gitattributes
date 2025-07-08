@@ -7,3 +7,5 @@ phpcs.xml export-ignore
 phpstan.neon.dist export-ignore
 README.md export-ignore
 phpstan-stubs export-ignore
+assets/build/index.assets.php export-ignore
+assets/src export-ignore

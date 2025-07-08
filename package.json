@@ -2,13 +2,13 @@
   "name": "plugin-family",
   "version": "1.0.0",
   "description": "Organizes and displays WP Media plugin family across other members.",
-  "main": "assets/index.js",
+  "main": "src/assets/build/index.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "start": "wp-scripts start assets/src/js/index.js",
-    "build": "wp-scripts build assets/src/js/index.js"
+    "start": "wp-scripts start src/assets/src/js/index.js",
+    "build": "wp-scripts build src/assets/src/js/index.js"
   },
   "repository": {
     "type": "git",
