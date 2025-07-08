@@ -23,7 +23,7 @@ class PluginFamily implements PluginFamilyInterface {
 		$events                  = self::get_post_install_event();
 		$events['admin_notices'] = 'display_error_notice';
 		$events['enqueue_block_editor_assets'] = 'enqueue_assets';
-		$events['wp_ajax_my_custom_action'] = 'install_imagify';
+		$events['wp_ajax_install_imagify'] = 'install_imagify';
 
 		return $events;
 	}
@@ -286,23 +286,15 @@ class PluginFamily implements PluginFamilyInterface {
 			]
 		);
 
-		wp_localize_script( 'plugin-family-script', 'MyAjax', array(
+		wp_localize_script( 'plugin-family-script', 'wpmedia_pluginfamily', array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
-			'nonce'    => wp_create_nonce( 'my_action_nonce' ),
-		));
-	}
-
-	public function register_endpoints() {
-		register_rest_route( 'wpmedia/plugin-family', 'install-imagify', array(
-			'methods'  => 'POST',
-			'callback' => [ $this, 'install_imagify' ],
-			'permission_callback' => function () {
-				return current_user_can( 'manage_options' );
-			},
+			'nonce'    => wp_create_nonce( 'install-imagify-nonce' ),
 		));
 	}
 
 	public function install_imagify() {
+		check_ajax_referer( 'install-imagify-nonce' );
+
 		if ( ! current_user_can( is_multisite() ? 'manage_network_plugins' : 'install_plugins' ) ) {
 			return rest_ensure_response( array( 'success' => false, 'message' => __( 'Not Allowed', '' ) ) );
 		}
@@ -313,9 +305,8 @@ class PluginFamily implements PluginFamilyInterface {
 
 		$activated = activate_plugin( $this->get_plugin( 'imagify' ), '', is_multisite() );
 		if ( is_wp_error( $activated ) ) {
-			return rest_ensure_response( array( 'success' => false, 'message' => $activated->get_error_message() ) );
+			wp_send_json_error( $activated->get_error_message() );
 		}
-
-		return rest_ensure_response( array( 'success' => true, 'message' => __( 'Installed', '' ) ) );
+		wp_send_json_success( __( 'Installed', '' ) );
 	}
 }

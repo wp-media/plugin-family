@@ -1,39 +1,41 @@
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { Fragment } from '@wordpress/element';
+import { Fragment, useState } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/block-editor';
 import {PanelBody, Button, Icon} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { plusCircle } from '@wordpress/icons';
-import apiFetch from '@wordpress/api-fetch';
 
-let installImagifyButtonHandler = async () => {
-	try {
-		const response = await fetch(MyAjax.ajax_url, {
-			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: new URLSearchParams({
-				action: 'my_custom_action',
-				_ajax_nonce: MyAjax.nonce,
-				// ...more data as needed
-			}).toString(),
-		});
-		const result = await response.json();
-		if (result.success) {
-			// Handle success
-			console.log(result.data);
-		} else {
-			// Handle failure
-			console.error(result.data);
-		}
-	} catch (error) {
-		console.error('AJAX error:', error);
-	}
-};
 
 const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
-		if ( props.name !== 'core/image' ) {
+		const [loading, setLoading] = useState(false);
+		const [success, setSuccess] = useState(false);
+
+		const installImagifyButtonHandler = async () => {
+			setLoading(true);
+			try {
+				const response = await fetch(wpmedia_pluginfamily.ajax_url, {
+					method: 'POST',
+					headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+					body: new URLSearchParams({
+						action: 'install_imagify',
+						_ajax_nonce: wpmedia_pluginfamily.nonce,
+					}).toString(),
+				});
+				const result = await response.json();
+				if (result.success) {
+					setSuccess(true);
+					// Open plugins page in new tab
+					window.open('/wp-admin/plugins.php', '_blank');
+				}
+			} catch (error) {
+				console.error('AJAX error: ', error);
+			}
+			setLoading(false);
+		};
+
+		if (props.name !== 'core/image') {
 			return <BlockEdit { ...props } />;
 		}
 
@@ -43,22 +45,31 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 				<InspectorControls>
 					<div style={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', marginBottom: '8px' }}>
 						<Icon icon={ plusCircle } style={{ marginRight: 8, marginLeft: 8 }} />
-						<span>{__('Optimize Your Images', '')}</span>
+						<span>{__('Optimize Your Images', 'text-domain')}</span>
 					</div>
 					<PanelBody
 						title=""
 						initialOpen={true}
 					>
-						<p style={{marginLeft: 16}}>{__( 'Boost your site’s performance by compressing images with Imagify, developed by WP Rocket.', '' )}</p>
-						<Button
-							style={{marginLeft: 16}}
-							isSecondary
-							onClick={ installImagifyButtonHandler }
-						>
-							{ __( 'Install Imagify Now', 'text-domain' ) }
-						</Button>
+						<p style={{marginLeft: 16}}>
+							{__('Boost your site’s performance by compressing images with Imagify, developed by WP Rocket.', 'text-domain')}
+						</p>
+						{ success ? (
+							<p style={{marginLeft: 16, color: 'green', fontWeight: 'bold'}}>
+								{__('Imagify installed! See Plugins page for details.', 'text-domain')}
+							</p>
+						) : (
+							<Button
+								style={{marginLeft: 16}}
+								isSecondary
+								isBusy={loading}
+								disabled={loading}
+								onClick={ installImagifyButtonHandler }
+							>
+								{ __( 'Install Imagify Now', 'text-domain' ) }
+							</Button>
+						)}
 					</PanelBody>
-
 				</InspectorControls>
 			</Fragment>
 		);
