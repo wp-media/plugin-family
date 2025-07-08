@@ -5,8 +5,24 @@ import { InspectorControls } from '@wordpress/block-editor';
 import {PanelBody, Button, Icon} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { plusCircle } from '@wordpress/icons';
+import apiFetch from '@wordpress/api-fetch';
 
-const withImageBlockButton = createHigherOrderComponent( ( BlockEdit ) => {
+let installImagifyButtonHandler = async () => {
+	try {
+		const response = await apiFetch({
+			path: '/wpmedia/plugin-family/install-imagify',
+			method: 'POST',
+			data: {},
+		});
+		// Handle response
+		console.log('Success:', response);
+	} catch (error) {
+		// Handle error
+		console.error('Error:', error);
+	}
+};
+
+const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		if ( props.name !== 'core/image' ) {
 			return <BlockEdit { ...props } />;
@@ -28,9 +44,9 @@ const withImageBlockButton = createHigherOrderComponent( ( BlockEdit ) => {
 						<Button
 							style={{marginLeft: 16}}
 							isSecondary
-							onClick={ () => alert( 'Button clicked!' ) }
+							onClick={ installImagifyButtonHandler }
 						>
-							{ __( 'Install Imagify Now \n', 'text-domain' ) }
+							{ __( 'Install Imagify Now', 'text-domain' ) }
 						</Button>
 					</PanelBody>
 
@@ -38,10 +54,10 @@ const withImageBlockButton = createHigherOrderComponent( ( BlockEdit ) => {
 			</Fragment>
 		);
 	};
-}, 'withImageBlockButton' );
+}, 'promoteImagifyButton' );
 
 addFilter(
 	'editor.BlockEdit',
-	'my-namespace/with-image-block-button',
-	withImageBlockButton
+	'wpmedia-plugin-family/promote-imagify',
+	promoteImagifyButton
 );

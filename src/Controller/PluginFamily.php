@@ -23,7 +23,7 @@ class PluginFamily implements PluginFamilyInterface {
 		$events                  = self::get_post_install_event();
 		$events['admin_notices'] = 'display_error_notice';
 		$events['enqueue_block_editor_assets'] = 'enqueue_assets';
-
+		$events['rest_api_init'] = 'register_endpoints';
 
 		return $events;
 	}
@@ -90,8 +90,8 @@ class PluginFamily implements PluginFamilyInterface {
 	 *
 	 * @return void
 	 */
-	private function install() {
-		if ( $this->is_installed() ) {
+	private function install( $slug = '' ) {
+		if ( $this->is_installed( $slug ) ) {
 			return;
 		}
 
@@ -108,7 +108,7 @@ class PluginFamily implements PluginFamilyInterface {
 		require_once $upgrader_class; // @phpstan-ignore-line
 
 		$upgrader = new \Plugin_Upgrader( new \Automatic_Upgrader_Skin() );
-		$result   = $upgrader->install( $this->get_download_url() );
+		$result   = $upgrader->install( $this->get_download_url( $slug ) );
 
 		if ( is_wp_error( $result ) ) {
 			$this->set_error( $result );
@@ -122,8 +122,8 @@ class PluginFamily implements PluginFamilyInterface {
 	 *
 	 * @return boolean
 	 */
-	private function is_installed(): bool {
-		return file_exists( WP_PLUGIN_DIR . '/' . $this->get_plugin() );
+	private function is_installed( $slug = '' ): bool {
+		return file_exists( WP_PLUGIN_DIR . '/' . $this->get_plugin( $slug ) );
 	}
 
 	/**
@@ -157,7 +157,10 @@ class PluginFamily implements PluginFamilyInterface {
 	 *
 	 * @return string
 	 */
-	private function get_plugin(): string {
+	private function get_plugin( $slug = '' ): string {
+		if ( 'imagify' === $slug ) {
+			return 'imagify/imagify.php';
+		}
 		return rawurldecode( sanitize_text_field( wp_unslash( $_GET['plugin_to_install'] ) ) ) . '.php'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotValidated
 	}
 
@@ -166,7 +169,7 @@ class PluginFamily implements PluginFamilyInterface {
 	 *
 	 * @return string
 	 */
-	private function get_download_url(): string {
+	private function get_download_url( $slug = '' ): string {
 		$plugin_install = ABSPATH . 'wp-admin/includes/plugin-install.php';
 
 		if ( ! defined( 'ABSPATH' ) || ! file_exists( $plugin_install ) ) {
@@ -179,8 +182,12 @@ class PluginFamily implements PluginFamilyInterface {
 
 		require_once $plugin_install; // @phpstan-ignore-line
 
+		if ( empty( $slug ) ) {
+			$slug = $this->get_slug();
+		}
+
 		$data = [
-			'slug'   => $this->get_slug(),
+			'slug'   => $slug,
 			'fields' => [
 				'download_link'     => true,
 				'short_description' => false,
@@ -254,6 +261,10 @@ class PluginFamily implements PluginFamilyInterface {
 		exit;
 	}
 
+	private function is_imagify_installed(): bool {
+		return file_exists( WP_PLUGIN_DIR . '/imagify/imagify.php' );
+	}
+
 	private function is_imagify_activated(): bool {
 		return defined( 'IMAGIFY_VERSION' );
 	}
@@ -274,5 +285,28 @@ class PluginFamily implements PluginFamilyInterface {
 				'in_footer' => true,
 			]
 		);
+	}
+
+	public function register_endpoints() {
+		register_rest_route( 'wpmedia/plugin-family', 'install-imagify', array(
+			'methods'  => 'POST',
+			'callback' => [ $this, 'install_imagify' ],
+			'permission_callback' => function () {
+				return current_user_can( 'manage_options' );
+			},
+		));
+	}
+
+	public function install_imagify() {
+		if ( ! $this->is_imagify_installed() ) {
+			$this->install( 'imagify' );
+		}
+
+		$activated = activate_plugin( $this->get_plugin( 'imagify' ), '', is_multisite() );
+		if ( is_wp_error( $activated ) ) {
+			return rest_ensure_response( array( 'success' => false, 'message' => $activated->get_error_message() ) );
+		}
+
+		return rest_ensure_response( array( 'success' => true, 'message' => __( 'Installed', '' ) ) );
 	}
 }
