@@ -7,8 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "wp-scripts start assets-src/js/index.js",
-    "build": "wp-scripts build assets-src/js/index.js"
+    "start": "wp-scripts start assets-src/js/index.js assets-src/js/admin.js",
+    "build": "wp-scripts build assets-src/js/index.js assets-src/js/admin.js"
   },
   "repository": {
     "type": "git",

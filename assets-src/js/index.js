@@ -27,7 +27,7 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 				if (result.success) {
 					setSuccess(true);
 					// Open plugins page in new tab
-					window.open('/wp-admin/plugins.php', '_blank');
+					window.open(wpmedia_pluginfamily.plugins_page_url, '_blank');
 				}
 			} catch (error) {
 				console.error('AJAX error: ', error);
@@ -55,9 +55,14 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 							{__('Boost your site’s performance by compressing images with Imagify, developed by WP Rocket.', 'text-domain')}
 						</p>
 						{ success ? (
-							<p style={{marginLeft: 16, color: 'green', fontWeight: 'bold'}}>
-								{__('Imagify installed! See Plugins page for details.', 'text-domain')}
-							</p>
+							<a
+								href={wpmedia_pluginfamily.plugins_page_url}
+								target="_blank"
+								rel="noopener noreferrer"
+								style={{marginLeft: 16, color: 'green', fontWeight: 'bold'}}
+							>
+								{__('Imagify installed! Click here to start using it.', 'text-domain')}
+							</a>
 						) : (
 							<Button
 								style={{marginLeft: 16}}

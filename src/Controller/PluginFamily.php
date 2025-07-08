@@ -24,6 +24,7 @@ class PluginFamily implements PluginFamilyInterface {
 		$events['admin_notices'] = 'display_error_notice';
 		$events['enqueue_block_editor_assets'] = 'enqueue_assets';
 		$events['wp_ajax_install_imagify'] = 'install_imagify';
+		$events['admin_enqueue_scripts'] = 'enqueue_admin_assets';
 
 		return $events;
 	}
@@ -289,6 +290,7 @@ class PluginFamily implements PluginFamilyInterface {
 		wp_localize_script( 'plugin-family-script', 'wpmedia_pluginfamily', array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 			'nonce'    => wp_create_nonce( 'install-imagify-nonce' ),
+			'plugins_page_url' => admin_url('plugins.php'),
 		));
 	}
 
@@ -308,5 +310,27 @@ class PluginFamily implements PluginFamilyInterface {
 			wp_send_json_error( $activated->get_error_message() );
 		}
 		wp_send_json_success( __( 'Installed', '' ) );
+	}
+
+	public function enqueue_admin_assets( $page ) {
+		if ( ! in_array( $page, [ 'post.php', 'post-new.php', 'upload.php' ], true ) ) {
+			return;
+		}
+
+		if ( $this->is_imagify_activated() || wp_script_is( 'plugin-family-admin-script' ) ) {
+			return;
+		}
+
+		$script_url = plugin_dir_url( dirname( __FILE__ ) ) . 'assets/js/admin.js';
+		wp_enqueue_script(
+			'plugin-family-admin-script',
+			$script_url,
+			['jquery'], // jQuery as a dependency
+			'1.0.5',
+			[
+				'in_footer' => true,
+			]
+		);
+
 	}
 }
