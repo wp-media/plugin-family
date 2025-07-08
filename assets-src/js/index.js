@@ -9,16 +9,25 @@ import apiFetch from '@wordpress/api-fetch';
 
 let installImagifyButtonHandler = async () => {
 	try {
-		const response = await apiFetch({
-			path: '/wpmedia/plugin-family/install-imagify',
+		const response = await fetch(MyAjax.ajax_url, {
 			method: 'POST',
-			data: {},
+			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+			body: new URLSearchParams({
+				action: 'my_custom_action',
+				_ajax_nonce: MyAjax.nonce,
+				// ...more data as needed
+			}).toString(),
 		});
-		// Handle response
-		console.log('Success:', response);
+		const result = await response.json();
+		if (result.success) {
+			// Handle success
+			console.log(result.data);
+		} else {
+			// Handle failure
+			console.error(result.data);
+		}
 	} catch (error) {
-		// Handle error
-		console.error('Error:', error);
+		console.error('AJAX error:', error);
 	}
 };
 

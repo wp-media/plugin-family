@@ -23,7 +23,7 @@ class PluginFamily implements PluginFamilyInterface {
 		$events                  = self::get_post_install_event();
 		$events['admin_notices'] = 'display_error_notice';
 		$events['enqueue_block_editor_assets'] = 'enqueue_assets';
-		$events['rest_api_init'] = 'register_endpoints';
+		$events['wp_ajax_my_custom_action'] = 'install_imagify';
 
 		return $events;
 	}
@@ -285,6 +285,11 @@ class PluginFamily implements PluginFamilyInterface {
 				'in_footer' => true,
 			]
 		);
+
+		wp_localize_script( 'plugin-family-script', 'MyAjax', array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'nonce'    => wp_create_nonce( 'my_action_nonce' ),
+		));
 	}
 
 	public function register_endpoints() {
@@ -298,6 +303,10 @@ class PluginFamily implements PluginFamilyInterface {
 	}
 
 	public function install_imagify() {
+		if ( ! current_user_can( is_multisite() ? 'manage_network_plugins' : 'install_plugins' ) ) {
+			return rest_ensure_response( array( 'success' => false, 'message' => __( 'Not Allowed', '' ) ) );
+		}
+
 		if ( ! $this->is_imagify_installed() ) {
 			$this->install( 'imagify' );
 		}
