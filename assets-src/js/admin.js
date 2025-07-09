@@ -33,10 +33,10 @@ jQuery(document).ready(function($) {
 				// Open plugins page in new tab
 				window.open(wpmedia_pluginfamily.plugins_page_url, '_blank');
 			}
-			btn.fadeIn('slow');
 		} catch (error) {
 			console.error('AJAX error: ', error);
-			btn.fadeIn('slow');
 		}
+		btn.fadeIn('slow');
+
 	});
 });
