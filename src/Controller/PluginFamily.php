@@ -20,12 +20,12 @@ class PluginFamily implements PluginFamilyInterface {
 	 * @return array
 	 */
 	public static function get_subscribed_events(): array {
-		$events                  = self::get_post_install_event();
-		$events['admin_notices'] = 'display_error_notice';
+		$events                                = self::get_post_install_event();
+		$events['admin_notices']               = 'display_error_notice';
 		$events['enqueue_block_editor_assets'] = 'enqueue_assets';
-		$events['wp_ajax_install_imagify'] = 'install_imagify';
-		$events['admin_enqueue_scripts'] = 'enqueue_admin_assets';
-		$events['admin_footer'] = 'insert_footer_templates';
+		$events['wp_ajax_install_imagify']     = 'install_imagify';
+		$events['admin_enqueue_scripts']       = 'enqueue_admin_assets';
+		$events['admin_footer']                = 'insert_footer_templates';
 
 		return $events;
 	}
@@ -90,6 +90,7 @@ class PluginFamily implements PluginFamilyInterface {
 	/**
 	 * Install plugin.
 	 *
+	 * @param string $slug Plugin slug if found.
 	 * @return void
 	 */
 	private function install( $slug = '' ) {
@@ -122,6 +123,7 @@ class PluginFamily implements PluginFamilyInterface {
 	/**
 	 * Check if plugin is installed.
 	 *
+	 * @param string $slug Plugin slug if found.
 	 * @return boolean
 	 */
 	private function is_installed( $slug = '' ): bool {
@@ -157,6 +159,7 @@ class PluginFamily implements PluginFamilyInterface {
 	/**
 	 * Get plugin identifier.
 	 *
+	 * @param string $slug Plugin slug if found.
 	 * @return string
 	 */
 	private function get_plugin( $slug = '' ): string {
@@ -169,6 +172,7 @@ class PluginFamily implements PluginFamilyInterface {
 	/**
 	 * Get plugin download url.
 	 *
+	 * @param string $slug Plugin slug if found.
 	 * @return string
 	 */
 	private function get_download_url( $slug = '' ): string {
@@ -263,25 +267,40 @@ class PluginFamily implements PluginFamilyInterface {
 		exit;
 	}
 
+	/**
+	 * Check if imagify is installed or not.
+	 *
+	 * @return bool
+	 */
 	private function is_imagify_installed(): bool {
 		return file_exists( WP_PLUGIN_DIR . '/imagify/imagify.php' );
 	}
 
+	/**
+	 * Check if imagify is activated or not.
+	 *
+	 * @return bool
+	 */
 	private function is_imagify_activated(): bool {
 		return defined( 'IMAGIFY_VERSION' );
 	}
 
+	/**
+	 * Enqueue block editor assets
+	 *
+	 * @return void
+	 */
 	public function enqueue_assets() {
 		if ( $this->is_imagify_activated() || wp_script_is( 'plugin-family-script' ) ) {
 			return;
 		}
 
-		$script_url = plugin_dir_url( dirname( __FILE__ ) ) . 'assets/js/index.js';
+		$script_url = plugin_dir_url( __DIR__ ) . 'assets/js/index.js';
 
 		wp_enqueue_script(
 			'plugin-family-script',
 			$script_url,
-			array( 'react-jsx-runtime', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-primitives' ),
+			[ 'react-jsx-runtime', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-primitives' ],
 			'1.0.5',
 			[
 				'in_footer' => true,
@@ -291,11 +310,16 @@ class PluginFamily implements PluginFamilyInterface {
 		$this->add_install_imagify_localized_script( 'plugin-family-script' );
 	}
 
+	/**
+	 * Install Imagify using the ajax request.
+	 *
+	 * @return void
+	 */
 	public function install_imagify() {
 		check_ajax_referer( 'install-imagify-nonce' );
 
 		if ( ! current_user_can( is_multisite() ? 'manage_network_plugins' : 'install_plugins' ) ) {
-			return rest_ensure_response( array( 'success' => false, 'message' => __( 'Not Allowed', '%domain%' ) ) );
+			wp_send_json_error( __( 'Not Allowed', '%domain%' ) );
 		}
 
 		if ( ! $this->is_imagify_installed() ) {
@@ -309,21 +333,43 @@ class PluginFamily implements PluginFamilyInterface {
 		wp_send_json_success( __( 'Imagify installed! Click here to start using it.', '%domain%' ) );
 	}
 
-	private function can_enqueue_admin_assets( $page = '' ) {
+	/**
+	 * Check if we can enqueue admin assets or not.
+	 *
+	 * @param string $page Current page ID if found.
+	 * @return bool
+	 */
+	private function can_enqueue_admin_assets( $page = '' ): bool {
 		if ( empty( $page ) ) {
 			return in_array( get_current_screen()->id, [ 'post', 'upload' ], true );
 		}
 		return in_array( $page, [ 'post.php', 'post-new.php', 'upload.php' ], true );
 	}
 
+	/**
+	 * Add localized script to be used by scripts.
+	 *
+	 * @param string $script_id Script ID.
+	 * @return void
+	 */
 	private function add_install_imagify_localized_script( $script_id ) {
-		wp_localize_script( $script_id, 'wpmedia_pluginfamily', array(
-			'ajax_url' => admin_url( 'admin-ajax.php' ),
-			'nonce'    => wp_create_nonce( 'install-imagify-nonce' ),
-			'plugins_page_url' => admin_url('plugins.php'),
-		));
+		wp_localize_script(
+			$script_id,
+			'wpmedia_pluginfamily',
+			[
+				'ajax_url'         => admin_url( 'admin-ajax.php' ),
+				'nonce'            => wp_create_nonce( 'install-imagify-nonce' ),
+				'plugins_page_url' => admin_url( 'plugins.php' ),
+			]
+			);
 	}
 
+	/**
+	 * Enqueue Admin assets.
+	 *
+	 * @param string $page Page ID.
+	 * @return void
+	 */
 	public function enqueue_admin_assets( $page ) {
 		if ( ! $this->can_enqueue_admin_assets( $page ) ) {
 			return;
@@ -333,11 +379,11 @@ class PluginFamily implements PluginFamilyInterface {
 			return;
 		}
 
-		$script_url = plugin_dir_url( dirname( __FILE__ ) ) . 'assets/js/admin.js';
+		$script_url = plugin_dir_url( __DIR__ ) . 'assets/js/admin.js';
 		wp_enqueue_script(
 			'plugin-family-admin-script',
 			$script_url,
-			['jquery'], // jQuery as a dependency
+			[ 'jquery' ], // jQuery as a dependency.
 			'1.0.5',
 			[
 				'in_footer' => true,
@@ -346,7 +392,7 @@ class PluginFamily implements PluginFamilyInterface {
 
 		$this->add_install_imagify_localized_script( 'plugin-family-admin-script' );
 
-		$style_url = plugin_dir_url( dirname( __FILE__ ) ) . 'assets/css/style.css';
+		$style_url = plugin_dir_url( __DIR__ ) . 'assets/css/style.css';
 		wp_enqueue_style(
 			'plugin-family-admin-style',
 			$style_url,
@@ -355,6 +401,11 @@ class PluginFamily implements PluginFamilyInterface {
 		);
 	}
 
+	/**
+	 * Insert admin footer JS templates.
+	 *
+	 * @return void
+	 */
 	public function insert_footer_templates() {
 		if ( ! $this->can_enqueue_admin_assets() ) {
 			return;
