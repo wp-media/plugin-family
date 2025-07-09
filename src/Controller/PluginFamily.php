@@ -313,8 +313,15 @@ class PluginFamily implements PluginFamilyInterface {
 		wp_send_json_success( __( 'Installed', '' ) );
 	}
 
+	private function can_enqueue_admin_assets( $page = '' ) {
+		if ( empty( $page ) ) {
+			return in_array( get_current_screen()->id, [ 'post', 'upload' ], true );
+		}
+		return in_array( $page, [ 'post.php', 'post-new.php', 'upload.php' ], true );
+	}
+
 	public function enqueue_admin_assets( $page ) {
-		if ( ! in_array( $page, [ 'post.php', 'post-new.php', 'upload.php' ], true ) ) {
+		if ( ! $this->can_enqueue_admin_assets( $page ) ) {
 			return;
 		}
 
@@ -332,10 +339,19 @@ class PluginFamily implements PluginFamilyInterface {
 				'in_footer' => true,
 			]
 		);
-
+		$style_url = plugin_dir_url( dirname( __FILE__ ) ) . 'assets/css/style.css';
+		wp_enqueue_style(
+			'plugin-family-admin-style',
+			$style_url,
+			[],
+			'1.0.5'
+		);
 	}
 
 	public function insert_footer_templates() {
+		if ( ! $this->can_enqueue_admin_assets() ) {
+			return;
+		}
 		include_once __DIR__ . '/../View/promote-imagify-uploader.php';
 	}
 }

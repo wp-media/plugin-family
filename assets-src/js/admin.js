@@ -1,9 +1,10 @@
 jQuery(document).ready(function($) {
 	const observer = new MutationObserver(function(mutations) {
-		$('.attachment-info').each(function() {
-			if ($(this).next('.pluginfamily-promote-imagify').length === 0) {
+		$('.attachment-info .details').each(function() {
+			const info = $(this);
+			if (info.find('.pluginfamily-promote-imagify').length === 0) {
 				const templateHtml = $('#pluginfamily_promote_imagify_uploader_template').html();
-				$(templateHtml).insertAfter($(this));
+				$(templateHtml).appendTo(info);
 			}
 		});
 	});
