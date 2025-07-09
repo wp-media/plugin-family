@@ -25,6 +25,7 @@ class PluginFamily implements PluginFamilyInterface {
 		$events['enqueue_block_editor_assets'] = 'enqueue_assets';
 		$events['wp_ajax_install_imagify'] = 'install_imagify';
 		$events['admin_enqueue_scripts'] = 'enqueue_admin_assets';
+		$events['admin_footer'] = 'insert_footer_templates';
 
 		return $events;
 	}
@@ -332,5 +333,9 @@ class PluginFamily implements PluginFamilyInterface {
 			]
 		);
 
+	}
+
+	public function insert_footer_templates() {
+		include_once __DIR__ . '/../View/promote-imagify-uploader.php';
 	}
 }
