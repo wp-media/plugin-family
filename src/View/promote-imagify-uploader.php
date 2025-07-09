@@ -5,6 +5,7 @@ defined( 'ABSPATH' ) || exit;
 	<div class="pluginfamily-promote-imagify">
         <p>
 			<?php echo sprintf(
+                // translators: %1$is = Plugin Name.
 				esc_html__( '%1$s recommends you to optimize your images for even better website performance.', '%domain%' ),
 				'WP Rocket'
 			);
