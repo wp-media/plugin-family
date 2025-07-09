@@ -11,4 +11,32 @@ jQuery(document).ready(function($) {
 
 	// Observe the body for added nodes (media modal is added dynamically)
 	observer.observe(document.body, { childList: true, subtree: true });
+
+	$(document).on('click', '#pluginfamily_install_imagify', async (event) => {
+		event.preventDefault();
+
+		const btn = $('#pluginfamily_install_imagify');
+		btn.fadeTo('slow', 0.5);
+
+		try {
+			const response = await fetch(wpmedia_pluginfamily.ajax_url, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: new URLSearchParams({
+					action: 'install_imagify',
+					_ajax_nonce: wpmedia_pluginfamily.nonce,
+				}).toString(),
+			});
+			const result = await response.json();
+			if (result.success) {
+				btn.html(result.message);
+				// Open plugins page in new tab
+				window.open(wpmedia_pluginfamily.plugins_page_url, '_blank');
+			}
+			btn.fadeIn('slow');
+		} catch (error) {
+			console.error('AJAX error: ', error);
+			btn.fadeIn('slow');
+		}
+	});
 });
