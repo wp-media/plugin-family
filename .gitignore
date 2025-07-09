@@ -3,3 +3,4 @@
 tests/Unit/.phpunit.result.cache
 node_modules
 .idea
+src/assets/js/*.php
