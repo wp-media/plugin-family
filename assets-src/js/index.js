@@ -45,14 +45,14 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 				<InspectorControls>
 					<div style={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', marginBottom: '8px' }}>
 						<Icon icon={ plusCircle } style={{ marginRight: 8, marginLeft: 8 }} />
-						<span>{__('Optimize Your Images', 'text-domain')}</span>
+						<span>{__('Optimize Your Images', '%domain%')}</span>
 					</div>
 					<PanelBody
 						title=""
 						initialOpen={true}
 					>
 						<p style={{marginLeft: 16}}>
-							{__('Boost your site’s performance by compressing images with Imagify, developed by WP Rocket.', 'text-domain')}
+							{__('Boost your site’s performance by compressing images with Imagify, developed by WP Rocket.', '%domain%')}
 						</p>
 						{ success ? (
 							<a
@@ -61,7 +61,7 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 								rel="noopener noreferrer"
 								style={{marginLeft: 16, color: 'green', fontWeight: 'bold'}}
 							>
-								{__('Imagify installed! Click here to start using it.', 'text-domain')}
+								{__('Imagify installed! Click here to start using it.', '%domain%')}
 							</a>
 						) : (
 							<Button
@@ -71,7 +71,7 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 								disabled={loading}
 								onClick={ installImagifyButtonHandler }
 							>
-								{ __( 'Install Imagify Now', 'text-domain' ) }
+								{ __( 'Install Imagify Now', '%domain%' ) }
 							</Button>
 						)}
 					</PanelBody>

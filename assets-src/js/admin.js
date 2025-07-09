@@ -29,7 +29,7 @@ jQuery(document).ready(function($) {
 			});
 			const result = await response.json();
 			if (result.success) {
-				btn.html(result.message);
+				btn.text(result.data).attr('id', '');
 				// Open plugins page in new tab
 				window.open(wpmedia_pluginfamily.plugins_page_url, '_blank');
 			}
