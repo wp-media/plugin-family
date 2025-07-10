@@ -12,8 +12,10 @@ class PostInstall {
      * @var array
      */
     private static $files = [
-        'PluginFamily',
-        'wp_media_plugins',
+		'/Model/PluginFamily',
+		'/Model/wp_media_plugins',
+		'/Controller/PluginFamily',
+		'/View/promote-imagify-uploader',
     ];
 
     /**
@@ -35,7 +37,7 @@ class PostInstall {
 
         foreach ( self::$files as $file ) {
             // Construct file path.
-            $path = __DIR__ . '/Model/' . $file . '.php';
+            $path = __DIR__ . $file . '.php';
 
             if ( ! file_exists( $path ) ) {
                 $output->writeError( self::colorize( 'Could not find file: ' . $path . ', Does it exist?', 'red' ) );
