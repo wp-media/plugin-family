@@ -338,7 +338,7 @@ class PluginFamily implements PluginFamilyInterface {
 			wp_send_json_error( $activated->get_error_message() );
 		}
 
-		$this->set_imagify_partner( 'wp-rocket' );// Todo: make it dynamic, so the current plugin should pass it.
+		$this->set_imagify_partner( '%imagifypartnerid%' );
 		wp_send_json_success( __( 'Imagify installed! Click here to start using it.', '%domain%' ) );
 	}
 
@@ -348,7 +348,7 @@ class PluginFamily implements PluginFamilyInterface {
 	 * @param string $plugin Current plugin.
 	 * @return void
 	 */
-	private function set_imagify_partner($plugin ) {
+	private function set_imagify_partner( $plugin ) {
 		update_option( 'imagifyp_id', $plugin, false );
 	}
 

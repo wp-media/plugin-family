@@ -30,10 +30,15 @@ class PostInstall {
         $composer = $event->getComposer();
         $extra = $composer->getPackage()->getExtra();
 
-        if ( ! isset( $extra['plugin_domain'] ) ) {
-            $output->writeError( self::colorize( 'Plugin domain is not set in the composer extra configuration.', 'red' ) );
-            return;
-        }
+		if ( ! isset( $extra['plugin_domain'] ) ) {
+			$output->writeError( self::colorize( 'Plugin domain is not set in the composer extra configuration (key: plugin_domain).', 'red' ) );
+			return;
+		}
+
+		if ( ! isset( $extra['imagify_partner'] ) ) {
+			$output->writeError( self::colorize( 'Imagify partner ID is not set in the composer extra configuration (key: imagify_partner).', 'red' ) );
+			return;
+		}
 
         foreach ( self::$files as $file ) {
             // Construct file path.
@@ -52,8 +57,17 @@ class PostInstall {
                 return;
             }
 
+			$mappings = [
+				'%domain%'           => $extra['plugin_domain'],
+				'%imagifypartnerid%' => $extra['imagify_partner'],
+			];
+
             // Update file content.
-            $updated_content = str_replace( '%domain%', $extra['plugin_domain'], $content );
+            $updated_content = str_replace(
+				array_keys( $mappings ),
+				array_values( $mappings ),
+				$content
+			);
             $result = file_put_contents( $path, $updated_content );
 
             if ( false === $result ) {
