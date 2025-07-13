@@ -12,6 +12,6 @@ defined( 'ABSPATH' ) || exit;
 			);
 			?>
 		</p>
-        <button id="pluginfamily_install_imagify"><?php esc_html_e( 'Install Imagify Plugin', '%domain%' ); ?></button>
+		<button id="pluginfamily_install_imagify"><?php esc_html_e( 'Install Imagify Plugin', '%domain%' ); ?></button>
 	</div>
 </script>
