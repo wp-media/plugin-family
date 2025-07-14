@@ -30,8 +30,22 @@ jQuery(document).ready(function($) {
 			const result = await response.json();
 			if (result.success) {
 				btn.text(result.data).attr('id', '');
-				// Open plugins page in new tab
-				window.open(wpmedia_pluginfamily.plugins_page_url, '_blank');
+				// Try to open the new tab
+				const win = window.open(wpmedia_pluginfamily.plugins_page_url, '_blank');
+				if (!win) {
+					// Fallback: show a manual link
+					if ($('#pluginfamily_open_plugins_fallback').length === 0) {
+						$('<a>')
+							.attr({
+								href: wpmedia_pluginfamily.plugins_page_url,
+								target: '_blank',
+								id: 'pluginfamily_open_plugins_fallback',
+							})
+							.text(result.data)
+							.insertAfter(btn);
+					}
+				}
+				btn.remove();
 			}
 		} catch (error) {
 			console.error('AJAX error: ', error);
