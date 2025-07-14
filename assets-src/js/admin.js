@@ -36,7 +36,6 @@ jQuery(document).ready(function($) {
 		} catch (error) {
 			console.error('AJAX error: ', error);
 		}
-		btn.fadeIn('slow');
-
+		btn.fadeTo('slow', 1);
 	});
 });

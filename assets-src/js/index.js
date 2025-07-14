@@ -59,7 +59,7 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 								href={wpmedia_pluginfamily.plugins_page_url}
 								target="_blank"
 								rel="noopener noreferrer"
-								style={{marginLeft: 16, color: 'green', fontWeight: 'bold'}}
+								style={{marginLeft: 16, color: 'green', fontWeight: 'bold', display: 'block'}}
 							>
 								{__('Imagify installed! Click here to start using it.', '%domain%')}
 							</a>
