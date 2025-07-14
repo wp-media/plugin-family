@@ -285,7 +285,7 @@ class PluginFamily implements PluginFamilyInterface {
 	}
 
 	/**
-	Returns a custom download url for plugin if exists.
+	 * Returns a custom download url for plugin if exists.
 	 *
 	 * @param string $plugin_slug plugin slug.
 	 * @return string|bool
