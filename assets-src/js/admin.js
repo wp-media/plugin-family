@@ -1,8 +1,9 @@
 jQuery(document).ready(function($) {
+	let removed = false;
 	const observer = new MutationObserver(function(mutations) {
 		$('.attachment-info .details').each(function() {
 			const info = $(this);
-			if (info.find('.pluginfamily-promote-imagify').length === 0) {
+			if (info.find('.pluginfamily-promote-imagify').length === 0 && !removed) {
 				const templateHtml = $('#pluginfamily_promote_imagify_uploader_template').html();
 				$(templateHtml).appendTo(info);
 			}
@@ -60,7 +61,7 @@ jQuery(document).ready(function($) {
 		promote_imagify.fadeTo('slow', 0.5);
 
 		try {
-			const response = await fetch(wpmedia_pluginfamily.ajax_url, {
+			await fetch(wpmedia_pluginfamily.ajax_url, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 				body: new URLSearchParams({
@@ -71,6 +72,9 @@ jQuery(document).ready(function($) {
 		} catch (error) {
 			console.error('AJAX error: ', error);
 		}
-		promote_imagify.remove();
+		promote_imagify.fadeTo('slow', 1, () => {
+			promote_imagify.remove();
+			removed = true;
+		});
 	});
 });
