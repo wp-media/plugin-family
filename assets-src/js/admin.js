@@ -52,4 +52,25 @@ jQuery(document).ready(function($) {
 		}
 		btn.fadeTo('slow', 1);
 	});
+
+	$(document).on('click', '.pluginfamily-promote-imagify-dismiss-icon', async (event) => {
+		event.preventDefault();
+
+		const promote_imagify = $('.pluginfamily-promote-imagify');
+		promote_imagify.fadeTo('slow', 0.5);
+
+		try {
+			const response = await fetch(wpmedia_pluginfamily.ajax_url, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: new URLSearchParams({
+					action: 'dismiss_promote_imagify',
+					_ajax_nonce: wpmedia_pluginfamily.nonce,
+				}).toString(),
+			});
+		} catch (error) {
+			console.error('AJAX error: ', error);
+		}
+		promote_imagify.remove();
+	});
 });
