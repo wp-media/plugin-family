@@ -4,7 +4,7 @@ import { Fragment, useState } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/block-editor';
 import {PanelBody, Button, Icon} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { plusCircle, close } from '@wordpress/icons';
+import { plusCircle, closeSmall } from '@wordpress/icons';
 
 
 const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
@@ -63,8 +63,7 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 					<div style={{display: 'flex', alignItems: 'center', fontWeight: 'bold', marginBottom: '8px'}}>
 						<Icon icon={plusCircle} style={{marginRight: 8, marginLeft: 8}}/>
 						<span style={{flex: 1}}>{__('Optimize Your Images', '%domain%')}</span>
-						<Button onClick={ dismissHandler }>
-							<Icon icon={close}/>
+						<Button onClick={ dismissHandler } size="compact" icon={closeSmall} iconPosition="right">
 						</Button>
 					</div>
 					<PanelBody
