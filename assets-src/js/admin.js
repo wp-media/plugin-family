@@ -1,8 +1,9 @@
 jQuery(document).ready(function($) {
+	let removed = false;
 	const observer = new MutationObserver(function(mutations) {
 		$('.attachment-info .details').each(function() {
 			const info = $(this);
-			if (info.find('.pluginfamily-promote-imagify').length === 0) {
+			if (info.find('.pluginfamily-promote-imagify').length === 0 && !removed) {
 				const templateHtml = $('#pluginfamily_promote_imagify_uploader_template').html();
 				$(templateHtml).appendTo(info);
 			}
@@ -51,5 +52,29 @@ jQuery(document).ready(function($) {
 			console.error('AJAX error: ', error);
 		}
 		btn.fadeTo('slow', 1);
+	});
+
+	$(document).on('click', '.pluginfamily-promote-imagify-dismiss-icon', async (event) => {
+		event.preventDefault();
+
+		const promote_imagify = $('.pluginfamily-promote-imagify');
+		promote_imagify.fadeTo('slow', 0.5);
+
+		try {
+			await fetch(wpmedia_pluginfamily.ajax_url, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: new URLSearchParams({
+					action: 'dismiss_promote_imagify',
+					_ajax_nonce: wpmedia_pluginfamily.nonce,
+				}).toString(),
+			});
+		} catch (error) {
+			console.error('AJAX error: ', error);
+		}
+		promote_imagify.fadeTo('slow', 1, () => {
+			promote_imagify.remove();
+			removed = true;
+		});
 	});
 });
