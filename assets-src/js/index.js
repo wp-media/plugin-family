@@ -4,13 +4,14 @@ import { Fragment, useState } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/block-editor';
 import {PanelBody, Button, Icon} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { plusCircle } from '@wordpress/icons';
+import { plusCircle, close } from '@wordpress/icons';
 
 
 const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		const [loading, setLoading] = useState(false);
 		const [success, setSuccess] = useState(false);
+		const [visible, setVisible] = useState(true);
 
 		const installImagifyButtonHandler = async () => {
 			setLoading(true);
@@ -35,7 +36,23 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 			setLoading(false);
 		};
 
-		if (props.name !== 'core/image') {
+		const dismissHandler = async () => {
+			try {
+				await fetch(wpmedia_pluginfamily.ajax_url, {
+					method: 'POST',
+					headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+					body: new URLSearchParams({
+						action: 'dismiss_promote_imagify',
+						_ajax_nonce: wpmedia_pluginfamily.nonce,
+					}).toString(),
+				});
+			} catch (error) {
+				console.error('AJAX error: ', error);
+			}
+			setVisible(false);
+		};
+
+		if (props.name !== 'core/image' || !visible) {
 			return <BlockEdit { ...props } />;
 		}
 
@@ -43,9 +60,12 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 			<Fragment>
 				<BlockEdit { ...props } />
 				<InspectorControls>
-					<div style={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', marginBottom: '8px' }}>
-						<Icon icon={ plusCircle } style={{ marginRight: 8, marginLeft: 8 }} />
-						<span>{__('Optimize Your Images', '%domain%')}</span>
+					<div style={{display: 'flex', alignItems: 'center', fontWeight: 'bold', marginBottom: '8px'}}>
+						<Icon icon={plusCircle} style={{marginRight: 8, marginLeft: 8}}/>
+						<span style={{flex: 1}}>{__('Optimize Your Images', '%domain%')}</span>
+						<Button onClick={ dismissHandler }>
+							<Icon icon={close}/>
+						</Button>
 					</div>
 					<PanelBody
 						title=""
@@ -54,7 +74,7 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 						<p style={{marginLeft: 16}}>
 							{__('Boost your site’s performance by compressing images with Imagify, developed by WP Rocket.', '%domain%')}
 						</p>
-						{ success ? (
+						{success ? (
 							<a
 								href={wpmedia_pluginfamily.plugins_page_url}
 								target="_blank"
