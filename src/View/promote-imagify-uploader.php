@@ -10,11 +10,14 @@ defined( 'ABSPATH' ) || exit;
 		</button>
 		<p>
 			<?php
-			printf(
-				// translators: %1$is = Plugin Name.
-				esc_html__( '%1$s recommends you to optimize your images for even better website performance.', '%domain%' ),
-				'WP Rocket'
-			);
+				echo apply_filters(
+					'wpmedia/plugin_family/notice_text',
+					sprintf(
+						// translators: %1$is = Plugin Name.
+						esc_html__( '%1$s recommends you to optimize your images for even better website performance.', '%domain%' ),
+						'WP Rocket'
+					)
+				);
 			?>
 		</p>
 		<button id="pluginfamily_install_imagify"><?php esc_html_e( 'Install Imagify Plugin', '%domain%' ); ?></button>
