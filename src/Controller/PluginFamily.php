@@ -387,7 +387,9 @@ class PluginFamily implements PluginFamilyInterface {
 			wp_send_json_error( $activated->get_error_message() );
 		}
 
-		$this->set_imagify_partner( '%imagifypartnerid%' );
+		// Allow host plugin to define the Imagify partner ID.
+		$partner = apply_filters( 'wpmedia/plugin_family/imagify_partner', '%imagifypartnerid%' );
+		$this->set_imagify_partner( $partner );
 		wp_send_json_success( __( 'Imagify installed! Click here to start using it.', '%domain%' ) );
 	}
 
@@ -411,10 +413,28 @@ class PluginFamily implements PluginFamilyInterface {
 		if ( $this->is_promote_imagify_dismissed() ) {
 			return false;
 		}
-		if ( empty( $page ) ) {
-			return in_array( get_current_screen()->id, [ 'post', 'upload' ], true );
+
+		// Allow core admin screens; third-parties can extend via the filter below.
+		$allowed_pages = [ 'post.php', 'post-new.php', 'upload.php' ];
+
+		// If hook suffix is provided by admin_enqueue_scripts.
+		if ( ! empty( $page ) ) {
+			$allowed = in_array( $page, $allowed_pages, true );
+			/**
+			 * Filter whether plugin-family assets can be enqueued on a given admin page.
+			 *
+			 * @param bool   $allowed Whether enqueuing is allowed.
+			 * @param string $page    Hook suffix.
+			 * @param string $screen  Screen ID (empty in this branch).
+			 */
+			return (bool) apply_filters( 'wpmedia/plugin_family/can_enqueue_admin_assets', $allowed, $page, '' );
 		}
-		return in_array( $page, [ 'post.php', 'post-new.php', 'upload.php' ], true );
+
+		// Fallback to current screen ID checks.
+		$screen_id = function_exists( 'get_current_screen' ) && get_current_screen() ? get_current_screen()->id : '';
+		$allowed   = in_array( $screen_id, [ 'post', 'upload' ], true ) || in_array( $screen_id, $allowed_pages, true );
+
+		return (bool) apply_filters( 'wpmedia/plugin_family/can_enqueue_admin_assets', $allowed, '', $screen_id );
 	}
 
 	/**
@@ -428,6 +448,7 @@ class PluginFamily implements PluginFamilyInterface {
 			'ajax_url'         => admin_url( 'admin-ajax.php' ),
 			'nonce'            => wp_create_nonce( 'install-imagify-nonce' ),
 			'plugins_page_url' => admin_url( 'plugins.php' ),
+			'notice_text'      => apply_filters( 'wpmedia/plugin_family/notice_text', esc_html__( 'Boost your site\'s performance by compressing images with Imagify, developed by WP Rocket.', '%domain%' ) ),
 		];
 		wp_add_inline_script(
 			$script_id,
