@@ -15,6 +15,22 @@ class PluginFamily implements PluginFamilyInterface {
 	private $version = '1.0.6';
 
 	/**
+	 * Configuration options passed during initialization.
+	 *
+	 * Supported keys:
+	 * - screen_ids: array of admin page ids where assets should load
+	 * - notice_text: string used in the uploader notice template
+	 *
+	 * Defaults preserve previous behavior for consumers that do not pass config.
+	 *
+	 * @var array
+	 */
+	private $config = [
+		'screen_ids'  => [ 'post.php', 'post-new.php', 'upload.php' ],
+		'notice_text' => '',
+	];
+
+	/**
 	 * Error transient.
 	 *
 	 * @var string
@@ -36,6 +52,18 @@ class PluginFamily implements PluginFamilyInterface {
 		$events['admin_footer']                    = 'insert_footer_templates';
 
 		return $events;
+	}
+
+	/**
+	 * Constructor allowing optional configuration.
+	 *
+	 * @param array $config Configuration array.
+	 */
+	public function __construct( array $config = [] ) {
+		if ( ! empty( $config ) ) {
+			// Merge provided config with defaults, preserving prior defaults for compatibility.
+			$this->config = array_merge( $this->config, $config );
+		}
 	}
 
 	/**
@@ -388,6 +416,11 @@ class PluginFamily implements PluginFamilyInterface {
 		}
 
 		$this->set_imagify_partner( '%imagifypartnerid%' );
+		/**
+		 * Fires after Imagify is installed and activated via Plugin Family.
+		 * Allows integrators to track installation/activation.
+		 */
+		do_action( 'wpmedia/plugin_family/imagify_installed' );
 		wp_send_json_success( __( 'Imagify installed! Click here to start using it.', '%domain%' ) );
 	}
 
@@ -411,10 +444,32 @@ class PluginFamily implements PluginFamilyInterface {
 		if ( $this->is_promote_imagify_dismissed() ) {
 			return false;
 		}
+
+		$allowed_pages = $this->config['screen_ids'];
 		if ( empty( $page ) ) {
-			return in_array( get_current_screen()->id, [ 'post', 'upload' ], true );
+			// Map configured admin pages to corresponding get_current_screen()->id values.
+			$allowed_screen_ids = array_unique(
+				array_map(
+					static function ( $p ) {
+						switch ( $p ) {
+							case 'post.php':
+							case 'post-new.php':
+								return 'post';
+							case 'upload.php':
+								return 'upload';
+							default:
+								// Allow passing raw screen ids directly (e.g., custom settings screens).
+								return $p;
+						}
+					},
+					$allowed_pages
+				)
+			);
+
+			return in_array( get_current_screen()->id, $allowed_screen_ids, true );
 		}
-		return in_array( $page, [ 'post.php', 'post-new.php', 'upload.php' ], true );
+
+		return in_array( $page, $allowed_pages, true );
 	}
 
 	/**
@@ -428,7 +483,9 @@ class PluginFamily implements PluginFamilyInterface {
 			'ajax_url'         => admin_url( 'admin-ajax.php' ),
 			'nonce'            => wp_create_nonce( 'install-imagify-nonce' ),
 			'plugins_page_url' => admin_url( 'plugins.php' ),
+			'notice_text'      => ! empty( $this->config['notice_text'] ) ? $this->config['notice_text'] : __( 'Boost your site\'s performance by compressing images with Imagify, developed by WP Rocket.', '%domain%' ),
 		];
+
 		wp_add_inline_script(
 			$script_id,
 			'window.wpmedia_pluginfamily = ' . wp_json_encode( $data ) . ';',
@@ -482,6 +539,8 @@ class PluginFamily implements PluginFamilyInterface {
 		if ( ! $this->can_enqueue_admin_assets() ) {
 			return;
 		}
+		// Make notice text available to the included template while preserving default text if empty.
+		$notice_text = $this->config['notice_text'] ?? '';
 		include_once __DIR__ . '/../View/promote-imagify-uploader.php';
 	}
 

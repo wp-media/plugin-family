@@ -71,7 +71,7 @@ const promoteImagifyButton = createHigherOrderComponent( ( BlockEdit ) => {
 						initialOpen={true}
 					>
 						<p style={{marginLeft: 16}}>
-							{__('Boost your site’s performance by compressing images with Imagify, developed by WP Rocket.', '%domain%')}
+							{ wpmedia_pluginfamily.notice_text }
 						</p>
 						{success ? (
 							<a
