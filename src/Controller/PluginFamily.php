@@ -15,22 +15,6 @@ class PluginFamily implements PluginFamilyInterface {
 	private $version = '1.0.6';
 
 	/**
-	 * Configuration options passed during initialization.
-	 *
-	 * Supported keys:
-	 * - screen_ids: array of admin page ids where assets should load
-	 * - notice_text: string used in the uploader notice template
-	 *
-	 * Defaults preserve previous behavior for consumers that do not pass config.
-	 *
-	 * @var array
-	 */
-	private $config = [
-		'screen_ids'  => [ 'post.php', 'post-new.php', 'upload.php' ],
-		'notice_text' => '',
-	];
-
-	/**
 	 * Error transient.
 	 *
 	 * @var string
@@ -55,15 +39,18 @@ class PluginFamily implements PluginFamilyInterface {
 	}
 
 	/**
-	 * Constructor allowing optional configuration.
+	 * Constructor with explicit parameters.
 	 *
-	 * @param array $config Configuration array.
+	 * @param string[] $screen_ids  Admin screen ids where assets should load. (Default: post.php, post-new.php, upload.php).
+	 * @param string   $notice_text Text used in the uploader notice. Empty string keeps default copy.
 	 */
-	public function __construct( array $config = [] ) {
-		if ( ! empty( $config ) ) {
-			// Merge provided config with defaults, preserving prior defaults for compatibility.
-			$this->config = array_merge( $this->config, $config );
-		}
+	public function __construct(
+		array $screen_ids = [ 'post.php', 'post-new.php', 'upload.php' ],
+		string $notice_text = ''
+	) {
+		// Normalize/validate inputs a bit.
+		$this->screen_ids  = $screen_ids;
+		$this->notice_text = (string) $notice_text;
 	}
 
 	/**
@@ -420,7 +407,7 @@ class PluginFamily implements PluginFamilyInterface {
 		 * Fires after Imagify is installed and activated via Plugin Family.
 		 * Allows integrators to track installation/activation.
 		 */
-		do_action( 'wpmedia/plugin_family/imagify_installed' );
+		do_action( 'wpm_pf_imagify_installed' );
 		wp_send_json_success( __( 'Imagify installed! Click here to start using it.', '%domain%' ) );
 	}
 
@@ -445,7 +432,7 @@ class PluginFamily implements PluginFamilyInterface {
 			return false;
 		}
 
-		$allowed_pages = $this->config['screen_ids'];
+		$allowed_pages = $this->screen_ids;
 		if ( empty( $page ) ) {
 			// Map configured admin pages to corresponding get_current_screen()->id values.
 			$allowed_screen_ids = array_unique(
@@ -483,7 +470,7 @@ class PluginFamily implements PluginFamilyInterface {
 			'ajax_url'         => admin_url( 'admin-ajax.php' ),
 			'nonce'            => wp_create_nonce( 'install-imagify-nonce' ),
 			'plugins_page_url' => admin_url( 'plugins.php' ),
-			'notice_text'      => ! empty( $this->config['notice_text'] ) ? $this->config['notice_text'] : __( 'Boost your site\'s performance by compressing images with Imagify, developed by WP Rocket.', '%domain%' ),
+			'notice_text'      => ! empty( $this->notice_text ) ? $this->notice_text : __( 'Boost your site\'s performance by compressing images with Imagify, developed by WP Rocket.', '%domain%' ),
 		];
 
 		wp_add_inline_script(
@@ -540,7 +527,11 @@ class PluginFamily implements PluginFamilyInterface {
 			return;
 		}
 		// Make notice text available to the included template while preserving default text if empty.
-		$notice_text = $this->config['notice_text'] ?? '';
+		$notice_text = $this->notice_text ?? printf(
+			// translators: %1$is = Plugin Name.
+			esc_html__( '%1$s recommends you to optimize your images for even better website performance.', '%domain%' ),
+			'WP Rocket'
+		);
 		include_once __DIR__ . '/../View/promote-imagify-uploader.php';
 	}
 

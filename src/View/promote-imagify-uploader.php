@@ -9,17 +9,7 @@ defined( 'ABSPATH' ) || exit;
 			</svg>
 		</button>
         <p>
-            <?php
-            if ( isset( $notice_text ) && is_string( $notice_text ) && '' !== $notice_text ) {
-                echo esc_html( $notice_text );
-            } else {
-                printf(
-                    // translators: %1$is = Plugin Name.
-                    esc_html__( '%1$s recommends you to optimize your images for even better website performance.', '%domain%' ),
-                    'WP Rocket'
-                );
-            }
-            ?>
+            <?php echo esc_html( $notice_text ); ?>
         </p>
 		<button id="pluginfamily_install_imagify"><?php esc_html_e( 'Install Imagify Plugin', '%domain%' ); ?></button>
 	</div>
