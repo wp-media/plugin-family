@@ -22,6 +22,20 @@ class PluginFamily implements PluginFamilyInterface {
 	protected $error_transient = 'plugin_family_error';
 
 	/**
+	 * Admin screen IDs where assets should load.
+	 *
+	 * @var array
+	 */
+	private $screen_ids;
+
+	/**
+	 * Text used in the uploader notice.
+	 *
+	 * @var string
+	 */
+	private $notice_text;
+
+	/**
 	 * Returns an array of events this subscriber listens to
 	 *
 	 * @return array
