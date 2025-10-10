@@ -33,7 +33,7 @@ class PluginFamily implements PluginFamilyInterface {
 	 *
 	 * @var string
 	 */
-	private $notice_text = null;
+	private $notice_text = '';
 
 	/**
 	 * Returns an array of events this subscriber listens to
@@ -421,7 +421,7 @@ class PluginFamily implements PluginFamilyInterface {
 		 * Fires after Imagify is installed and activated via Plugin Family.
 		 * Allows integrators to track installation/activation.
 		 */
-		do_action( 'plugin_family_imagify_installed' );
+		do_action( 'wpmedia_plugin_family_imagify_installed' );
 		wp_send_json_success( __( 'Imagify installed! Click here to start using it.', '%domain%' ) );
 	}
 
@@ -541,11 +541,13 @@ class PluginFamily implements PluginFamilyInterface {
 			return;
 		}
 		// Make notice text available to the included template while preserving default text if empty.
-		$notice = $this->notice_text ?? printf(
-			// translators: %1$is = Plugin Name.
-			esc_html__( '%1$s recommends you to optimize your images for even better website performance.', '%domain%' ),
-			'WP Rocket'
-		);
+		$notice = ! empty( $this->notice_text )
+			? $this->notice_text
+			: sprintf(
+				// translators: %1$s = Plugin Name.
+				__( '%1$s recommends you to optimize your images for even better website performance.', '%domain%' ),
+				'WP Rocket'
+			);
 		include_once __DIR__ . '/../View/promote-imagify-uploader.php';
 	}
 
