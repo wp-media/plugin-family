@@ -421,7 +421,7 @@ class PluginFamily implements PluginFamilyInterface {
 		 * Fires after Imagify is installed and activated via Plugin Family.
 		 * Allows integrators to track installation/activation.
 		 */
-		do_action( 'wpm_pf_imagify_installed' );
+		do_action( 'plugin_family_imagify_installed' );
 		wp_send_json_success( __( 'Imagify installed! Click here to start using it.', '%domain%' ) );
 	}
 
@@ -541,7 +541,7 @@ class PluginFamily implements PluginFamilyInterface {
 			return;
 		}
 		// Make notice text available to the included template while preserving default text if empty.
-		$notice_text = $this->notice_text ?? printf(
+		$notice_text = $this->notice_text ? $this->notice_text : printf(
 			// translators: %1$is = Plugin Name.
 			esc_html__( '%1$s recommends you to optimize your images for even better website performance.', '%domain%' ),
 			'WP Rocket'
