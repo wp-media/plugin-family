@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 			</svg>
 		</button>
 		<p>
-			<?php echo esc_html( $notice_text ); ?>
+			<?php echo esc_html( $notice ); ?>
 		</p>
 		<button id="pluginfamily_install_imagify"><?php esc_html_e( 'Install Imagify Plugin', '%domain%' ); ?></button>
 	</div>

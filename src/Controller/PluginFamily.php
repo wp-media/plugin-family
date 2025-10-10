@@ -33,7 +33,7 @@ class PluginFamily implements PluginFamilyInterface {
 	 *
 	 * @var string
 	 */
-	private $notice_text;
+	private $notice_text = null;
 
 	/**
 	 * Returns an array of events this subscriber listens to
@@ -541,7 +541,7 @@ class PluginFamily implements PluginFamilyInterface {
 			return;
 		}
 		// Make notice text available to the included template while preserving default text if empty.
-		$notice_text = $this->notice_text ? $this->notice_text : printf(
+		$notice = $this->notice_text ?? printf(
 			// translators: %1$is = Plugin Name.
 			esc_html__( '%1$s recommends you to optimize your images for even better website performance.', '%domain%' ),
 			'WP Rocket'
