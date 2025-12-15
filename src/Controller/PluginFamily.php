@@ -447,6 +447,8 @@ class PluginFamily implements PluginFamilyInterface {
 		}
 
 		$allowed_pages = $this->screen_ids;
+		$can_enqueue   = in_array( $page, $allowed_pages, true );
+
 		if ( empty( $page ) ) {
 			// Map configured admin pages to corresponding get_current_screen()->id values.
 			$allowed_screen_ids = array_unique(
@@ -468,8 +470,6 @@ class PluginFamily implements PluginFamilyInterface {
 			);
 
 			$can_enqueue = in_array( get_current_screen()->id, $allowed_screen_ids, true );
-		} else {
-			$can_enqueue = in_array( $page, $allowed_pages, true );
 		}
 
 		/**
