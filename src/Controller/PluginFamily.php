@@ -12,7 +12,7 @@ class PluginFamily implements PluginFamilyInterface {
 	 *
 	 * @var string
 	 */
-	private $version = '1.0.6';
+	private $version = '1.0.7';
 
 	/**
 	 * Error transient.
@@ -467,10 +467,19 @@ class PluginFamily implements PluginFamilyInterface {
 				)
 			);
 
-			return in_array( get_current_screen()->id, $allowed_screen_ids, true );
+			$can_enqueue = in_array( get_current_screen()->id, $allowed_screen_ids, true );
+		} else {
+			$can_enqueue = in_array( $page, $allowed_pages, true );
 		}
 
-		return in_array( $page, $allowed_pages, true );
+		/**
+		 * Filters whether to show the Imagify banner on Media gallery components.
+		 *
+		 * @since 1.0.7
+		 *
+		 * @param bool $can_enqueue Whether to enqueue the admin assets and show the banner.
+		 */
+		return wpm_apply_filters_typed( 'bool', 'wpmedia_plugin_family_show_imagify_banner', $can_enqueue );
 	}
 
 	/**
