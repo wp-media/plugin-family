@@ -383,7 +383,7 @@ class PluginFamily implements PluginFamilyInterface {
 		/**
 		 * Filters whether to show the Imagify banner on Media gallery components.
 		 *
-		 * @since 1.0.7
+		 * @since 1.0.8
 		 *
 		 * @param bool $show_banner Whether to enqueue the block editor assets and show the banner.
 		 */
@@ -486,7 +486,7 @@ class PluginFamily implements PluginFamilyInterface {
 		/**
 		 * Filters whether to show the Imagify banner on Media gallery components.
 		 *
-		 * @since 1.0.7
+		 * @since 1.0.8
 		 *
 		 * @param bool $can_enqueue Whether to enqueue the admin assets and show the banner.
 		 */
