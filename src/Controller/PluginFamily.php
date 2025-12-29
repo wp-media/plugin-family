@@ -12,7 +12,7 @@ class PluginFamily implements PluginFamilyInterface {
 	 *
 	 * @var string
 	 */
-	private $version = '1.0.6';
+	private $version = '1.0.8';
 
 	/**
 	 * Error transient.
@@ -380,6 +380,10 @@ class PluginFamily implements PluginFamilyInterface {
 			return;
 		}
 
+		if ( ! $this->should_show_imagify_banner() ) {
+			return;
+		}
+
 		$script_url = plugin_dir_url( __DIR__ ) . 'assets/js/index.js';
 
 		wp_enqueue_script(
@@ -447,6 +451,8 @@ class PluginFamily implements PluginFamilyInterface {
 		}
 
 		$allowed_pages = $this->screen_ids;
+		$can_enqueue   = in_array( $page, $allowed_pages, true );
+
 		if ( empty( $page ) ) {
 			// Map configured admin pages to corresponding get_current_screen()->id values.
 			$allowed_screen_ids = array_unique(
@@ -467,10 +473,10 @@ class PluginFamily implements PluginFamilyInterface {
 				)
 			);
 
-			return in_array( get_current_screen()->id, $allowed_screen_ids, true );
+			$can_enqueue = in_array( get_current_screen()->id, $allowed_screen_ids, true );
 		}
 
-		return in_array( $page, $allowed_pages, true );
+		return $this->should_show_imagify_banner( $can_enqueue );
 	}
 
 	/**
@@ -574,5 +580,26 @@ class PluginFamily implements PluginFamilyInterface {
 	 */
 	private function is_promote_imagify_dismissed() {
 		return ! empty( get_option( 'plugin_family_dismiss_promote_imagify' ) );
+	}
+
+	/**
+	 * Check if the Imagify banner should be shown.
+	 *
+	 * Applies the filter to allow developers to control banner visibility.
+	 *
+	 * @since 1.0.8
+	 *
+	 * @param bool $default_value The default value to filter.
+	 * @return bool Whether to show the Imagify banner.
+	 */
+	private function should_show_imagify_banner( bool $default_value = true ): bool {
+		/**
+		 * Filters whether to show the Imagify banner on Media gallery components.
+		 *
+		 * @since 1.0.8
+		 *
+		 * @param bool $show_banner Whether to show the Imagify banner.
+		 */
+		return wpm_apply_filters_typed( 'boolean', 'wpmedia_plugin_family_show_imagify_banner', $default_value );
 	}
 }
