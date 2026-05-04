@@ -9,3 +9,5 @@ README.md export-ignore
 phpstan-stubs export-ignore
 src/assets/js/index.assets.php export-ignore
 assets-src export-ignore
+webpack.config.js export-ignore
+package-lock.json export-ignore
