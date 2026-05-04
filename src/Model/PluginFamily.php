@@ -120,7 +120,7 @@ class PluginFamily {
 					];
 
 					if ( 'imagify' === $wpr_referrer ) {
-						$url  = 'https://wp-rocket.me/wp-rocket-for-imagify-users/';
+						$url      = 'https://wp-rocket.me/wp-rocket-for-imagify-users/';
 						$wpr_args = [
 							'utm_source'   => 'imagify',
 							'utm_medium'   => 'partners',
