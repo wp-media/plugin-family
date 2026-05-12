@@ -141,10 +141,10 @@ $expectedCategoryWithActivePluginAsTheLastElement = [
         ],
         'title' => 'Speed Up Your Website, Instantly',
         'desc'  => 'WP Rocket is the easiest way to make your WordPress website faster and boost your Google PageSpeed score. Get more traffic, better engagement, and higher conversions effortlessly.',
-        'link'  => 'https://wp-rocket.me/?utm_source=imagify-coupon&utm_medium=plugin&utm_campaign=imagify',
+        'link'  => 'https://wp-rocket.me/wp-rocket-for-imagify-users/?utm_source=imagify&utm_medium=partners&utm_campaign=imagify-benefits',
         'cta'   => [
             'text' => 'Get it Now',
-            'url'  => 'https://wp-rocket.me/?utm_source=imagify-coupon&utm_medium=plugin&utm_campaign=imagify'
+            'url'  => 'https://wp-rocket.me/wp-rocket-for-imagify-users/?utm_source=imagify&utm_medium=partners&utm_campaign=imagify-benefits'
         ],
     ],
     'backwpup/backwpup'                   => [

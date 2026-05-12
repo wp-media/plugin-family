@@ -112,7 +112,23 @@ class PluginFamily {
 
 				// Create unique CTA data for WP Rocket.
 				if ( 'wp-rocket/wp-rocket' === $plugin ) {
-					$url = 'https://wp-rocket.me/?utm_source=' . $wpr_referrer . '-coupon&utm_medium=plugin&utm_campaign=' . $wpr_referrer;
+					$url      = 'https://wp-rocket.me/';
+					$wpr_args = [
+						'utm_source'   => $wpr_referrer . '-coupon',
+						'utm_medium'   => 'plugin',
+						'utm_campaign' => $wpr_referrer,
+					];
+
+					if ( 'imagify' === $wpr_referrer ) {
+						$url      = 'https://wp-rocket.me/wp-rocket-for-imagify-users/';
+						$wpr_args = [
+							'utm_source'   => 'imagify',
+							'utm_medium'   => 'partners',
+							'utm_campaign' => 'imagify-benefits',
+						];
+					}
+
+					$url = add_query_arg( $wpr_args, $url );
 
 					$plugins[ $cat ]['plugins'][ $plugin ]['cta'] = [
 						'text' => __( 'Get it Now', '%domain%' ),
